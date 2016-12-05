@@ -1,0 +1,21 @@
+{
+  "name": "typescript_electron_app",
+  "version": "0.1.0",
+  "description": "Electron App with TypeScript",
+  "main": "app/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Takehiko YOSHIDA",
+  "license": "MIT",
+  "devDependencies": {
+    "del": "^2.2.2",
+    "electron": "^1.4.10",
+    "gulp": "^3.9.1",
+    "gulp-typescript": "^3.1.3",
+    "typescript": "^2.0.10"
+  },
+  "dependencies": {
+    "@types/electron": "^1.4.29"
+  }
+}
