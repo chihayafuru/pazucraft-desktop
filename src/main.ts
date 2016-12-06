@@ -1,6 +1,5 @@
-const electron = require('electron');
-const BrowserWindow: typeof Electron.BrowserWindow = electron.BrowserWindow;
-var app: Electron.App = electron.app;
+import {BrowserWindow} from "electron";
+import {app} from "electron";
 
 class MainApp {
     mainWindow: Electron.BrowserWindow = null;
