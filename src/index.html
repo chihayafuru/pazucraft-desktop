@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <title>FirstApp</title>
-</head>
-<body>
-<h1>First Electron App</h1>
-We are using io.js <script>document.write(process.version)</script>
-and Electron <script>document.write(process.versions['electron'])</script>.
-</body>
+    <head>
+        <meta charset="utf-8">
+        <title>My Electron App</title>
+    </head>
+    <body>
+        <h1>My Electron App</h1>
+        <p id="greeting">Loading ...</p>
+        <script>
+            require('./index')
+        </script>
+    </body>
 </html>
