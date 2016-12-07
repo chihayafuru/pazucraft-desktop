@@ -1,7 +1,6 @@
 import {remote} from "electron";
 const app = remote.app;
 const Menu = remote.Menu;
-const MenuItem = remote.MenuItem;
 
 class StartUp {
 
@@ -14,19 +13,19 @@ class StartUp {
                 {
                     label: 'Open',
                     click: (item, focusedWindow) => {
-                        console.log("open()");
+                        this.openFile();
                     }
                 },
                 {
                     label: 'Convert',
                     click: (item, focusedWindow) => {
-                        console.log("convert()");
+                        this.convertImage();
                     }
                 },
                 {
                     label: 'Save',
                     click: (item, focusedWindow) => {
-                        console.log("save()");
+                        this.saveFile();
                     }
                 },
                 {
@@ -51,6 +50,18 @@ class StartUp {
 
         let para = document.getElementById("greeting");
         para.innerText = "Hello Electron App!";
+    }
+
+    private openFile() {
+        console.log("openFile()");
+    }
+
+    private convertImage() {
+        console.log("convertImage()");
+    }
+
+    private saveFile() {
+        console.log("saveFile()");
     }
 }
 
