@@ -1,9 +1,5 @@
 import {remote} from "electron";
-import {join} from "path";
-
-const app = remote.app;
-const BrowserWindow = remote.BrowserWindow;
-const Menu = remote.Menu;
+import * as path from "path";
 
 class StartUp {
 
@@ -44,7 +40,7 @@ class StartUp {
                         if (this.modalWindow) {
                             this.modalWindow.close();
                         }
-                        app.quit();
+                        remote.app.quit();
                     }
                 }
             ]
@@ -52,9 +48,9 @@ class StartUp {
     ];
     
     constructor() {
-        let menu = Menu.buildFromTemplate(this.template);
-        Menu.setApplicationMenu(menu);
-
+        let menu = remote.Menu.buildFromTemplate(this.template);
+        remote.Menu.setApplicationMenu(menu);
+        
         let para = document.getElementById("greeting");
         para.innerText = "Hello Electron App!";
     }
@@ -66,8 +62,8 @@ class StartUp {
     private convertImage() {
         console.log("convertImage()");
 
-        const modalPath = join('file://', __dirname, 'modal.html');
-        this.modalWindow = new BrowserWindow({parent: this.browserWindow, frame: false, modal: true, transparent: true, resizable:false, alwaysOnTop: true});
+        const modalPath = path.join('file://', __dirname, 'modal.html');
+        this.modalWindow = new remote.BrowserWindow({parent: this.browserWindow, frame: false, modal: true, transparent: true, resizable:false, alwaysOnTop: true});
         this.modalWindow.loadURL(modalPath);
         this.modalWindow.show();
     }
