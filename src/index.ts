@@ -16,31 +16,31 @@ class StartUp {
             submenu:[
                 {
                     label: 'Open',
-                    click: (item, focusedWindow) => {
+                    click: (item : Electron.MenuItem, focusedWindow : Electron.BrowserWindow) => {
                         this.openFile();
                     }
                 },
                 {
                     label: 'Convert',
-                    click: (item, focusedWindow) => {
+                    click: (item : Electron.MenuItem, focusedWindow : Electron.BrowserWindow) => {
                         this.convertImage();
                     }
                 },
                 {
                     label: 'Save',
-                    click: (item, focusedWindow) => {
+                    click: (item : Electron.MenuItem, focusedWindow : Electron.BrowserWindow) => {
                         this.saveFile();
                     }
                 },
                 {
                     label: 'Toggle Developer Tools',
-                    click: (item, focusedWindow) => {
+                    click: (item : Electron.MenuItem, focusedWindow : Electron.BrowserWindow) => {
                         this.browserWindow.webContents.toggleDevTools();
                     }
                 },
                 {
                     label: 'Quit',
-                    click: (item, focusedWindow) => {
+                    click: (item : Electron.MenuItem, focusedWindow : Electron.BrowserWindow) => {
                         if (this.modalWindow) {
                             this.modalWindow.close();
                         }
