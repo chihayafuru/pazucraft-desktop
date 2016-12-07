@@ -1,10 +1,14 @@
 import {remote} from "electron";
+import {join} from "path";
+
 const app = remote.app;
+const BrowserWindow = remote.BrowserWindow;
 const Menu = remote.Menu;
 
 class StartUp {
 
     private browserWindow = remote.getCurrentWindow();
+    private modalWindow : Electron.BrowserWindow = null;
 
     private template = [
         {
@@ -37,6 +41,9 @@ class StartUp {
                 {
                     label: 'Quit',
                     click: (item, focusedWindow) => {
+                        if (this.modalWindow) {
+                            this.modalWindow.close();
+                        }
                         app.quit();
                     }
                 }
@@ -58,6 +65,11 @@ class StartUp {
 
     private convertImage() {
         console.log("convertImage()");
+
+        const modalPath = join('file://', __dirname, 'modal.html');
+        this.modalWindow = new BrowserWindow({parent: this.browserWindow, frame: false, modal: true, transparent: true, resizable:false, alwaysOnTop: true});
+        this.modalWindow.loadURL(modalPath);
+        this.modalWindow.show();
     }
 
     private saveFile() {
