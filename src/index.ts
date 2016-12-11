@@ -1,5 +1,6 @@
 import {remote} from "electron";
 import * as path from "path";
+import Development from "./development";
 
 class StartUp {
 
@@ -14,6 +15,8 @@ class StartUp {
     private menuConvert : Electron.MenuItem;
     private menuSave : Electron.MenuItem;
     private menuDevDebug : Electron.MenuItem;
+
+    private development : Development;
 
     private template = [
         {
@@ -47,7 +50,9 @@ class StartUp {
                     label: 'Quit',
                     click: (item : Electron.MenuItem, focusedWindow : Electron.BrowserWindow) => {
                         if (this.modalWindow) {
-                            this.modalWindow.close();
+                            if (!this.modalWindow.isDestroyed()) {
+                                this.modalWindow.destroy();
+                            }
                         }
                         remote.app.quit();
                     }
@@ -59,6 +64,7 @@ class StartUp {
     constructor() {
         this.initMenu();
         this.initButton();
+        this.development = new Development();
     }
 
     private initMenu() {
@@ -77,8 +83,6 @@ class StartUp {
             this.menuSave.enabled = false;
 
             //this.menuDevDebug.visible = false;
-
-            console.log(this.menuConvert.label);
         }
     }
 
@@ -90,23 +94,69 @@ class StartUp {
         this.buttonLoad.disabled = false;
         this.buttonConvert.disabled = true;
         this.buttonSave.disabled = true;
+
+        this.buttonLoad.addEventListener('click', (e)=>{this.openFile();});
+        this.buttonConvert.addEventListener('click', (e)=>{this.convertImage();});
+        this.buttonSave.addEventListener('click', (e)=>{this.saveFile();});
     }
 
     private openFile() {
-        console.log("openFile()");
+        const options : Electron.OpenDialogOptions= {
+            title: 'Load Image',
+            defaultPath: remote.app.getPath('pictures'),
+            filters: [
+                {name: 'Images', extensions: ['jpg']},
+            ],
+            properties: ['openFile']
+        };
+
+        remote.dialog.showOpenDialog(this.browserWindow, options, (fileNames) => {
+            if (fileNames) {
+                this.development.loadFile(fileNames[0],
+                                    (e) => {
+                                        this.buttonConvert.disabled = false;
+                                        this.menuConvert.enabled = true;
+                                        this.buttonSave.disabled = true;
+                                        this.menuSave.enabled = false;
+                                    },
+                                    function(e) {
+                                        console.log("fail to load file!!!");
+                                    }
+            );
+            }
+        });
     }
 
     private convertImage() {
-        console.log("convertImage()");
-
         const modalPath = path.join('file://', __dirname, 'modal.html');
         this.modalWindow = new remote.BrowserWindow({parent: this.browserWindow, frame: false, modal: true, transparent: true, resizable:false, alwaysOnTop: true});
         this.modalWindow.loadURL(modalPath);
         this.modalWindow.show();
+        const id = remote.powerSaveBlocker.start('prevent-app-suspension');
+        this.development.convertImage( (e) => {
+            this.buttonConvert.disabled = true;
+            this.menuConvert.enabled = false;
+            this.buttonSave.disabled = false;
+            this.menuSave.enabled = true;
+            remote.powerSaveBlocker.stop(id);
+            this.modalWindow.close();
+            this.modalWindow = null;
+        });
     }
 
     private saveFile() {
-        console.log("saveFile()");
+        var options = {
+            title: 'Save Image',
+            defaultPath: remote.app.getPath('pictures'),
+            filters: [
+                {name: 'Images', extensions: ['png']},
+            ],
+        }
+
+        remote.dialog.showSaveDialog(options, (fileName) => {
+            console.log(fileName);
+            this.development.saveFile(fileName);
+        });
     }
 }
 

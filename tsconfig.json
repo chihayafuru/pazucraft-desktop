@@ -1,7 +1,8 @@
 {
     "files": [
         "src/main.ts",
-        "src/index.ts"
+        "src/index.ts",
+        "src/development.ts"
     ],
     "compilerOptions": {
         "module": "commonjs",
