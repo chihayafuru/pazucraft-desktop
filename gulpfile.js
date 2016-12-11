@@ -23,8 +23,10 @@ gulp.task("copy-html", function () {
         .pipe(gulp.dest("app"));
 });
 
-gulp.task("default", ["copy-html","copy-icon"], function () {
+gulp.task("build", ["copy-html","copy-icon"], function() {
     return tsProject.src()
         .pipe(tsProject())
         .pipe(gulp.dest("app"));
 });
+
+gulp.task("default", ["build"]);
