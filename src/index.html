@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>My Electron App</title>
-    </head>
-    <body>
-        <h1>My Electron App</h1>
-        <p id="greeting">Loading ...</p>
-        <script>
-            require('./index')
-        </script>
-    </body>
+  <head>
+    <meta charset="utf-8">
+    <title>PazuCraft</title>
+  </head>
+  <body bgcolor="#CCCCCC">
+    <div=id="fixed_header">
+	    <button type="button" disabled="false" id="button_load"/>Load</button>
+	    <button type="button" disabled="true" id="button_convert"/>Convert</button>
+	    <button type="button" disabled="true" id="button_save"/>Save</button>
+    </div>
+    <div id="content">
+		  <canvas id="srcCanvas" hidden="true"></canvas>
+		  <canvas id="dstCanvas" hidden="true"></canvas>
+    </div>
+    <script>
+      require('./index.js')
+    </script>
+  </body>
 </html>

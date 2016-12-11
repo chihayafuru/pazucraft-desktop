@@ -6,6 +6,15 @@ class StartUp {
     private browserWindow = remote.getCurrentWindow();
     private modalWindow : Electron.BrowserWindow = null;
 
+    private buttonLoad : HTMLButtonElement;
+    private buttonConvert : HTMLButtonElement;
+    private buttonSave : HTMLButtonElement;
+
+    private menuLoad : Electron.MenuItem;
+    private menuConvert : Electron.MenuItem;
+    private menuSave : Electron.MenuItem;
+    private menuDevDebug : Electron.MenuItem;
+
     private template = [
         {
             label: 'File',
@@ -48,11 +57,39 @@ class StartUp {
     ];
     
     constructor() {
+        this.initMenu();
+        this.initButton();
+    }
+
+    private initMenu() {
         let menu = remote.Menu.buildFromTemplate(this.template);
         remote.Menu.setApplicationMenu(menu);
-        
-        let para = document.getElementById("greeting");
-        para.innerText = "Hello Electron App!";
+
+        if (menu.items[0].type == "submenu") {
+            let subMenu : Electron.Menu = <Electron.Menu>menu.items[0].submenu;
+            this.menuLoad = subMenu.items[0];
+            this.menuConvert = subMenu.items[1];
+            this.menuSave = subMenu.items[2];
+            this.menuDevDebug = subMenu.items[3];
+
+            this.menuLoad.enabled = true;
+            this.menuConvert.enabled = false;
+            this.menuSave.enabled = false;
+
+            //this.menuDevDebug.visible = false;
+
+            console.log(this.menuConvert.label);
+        }
+    }
+
+    private initButton() {
+        this.buttonLoad = <HTMLButtonElement>document.getElementById("button_load");
+        this.buttonConvert = <HTMLButtonElement>document.getElementById("button_convert");
+        this.buttonSave = <HTMLButtonElement>document.getElementById("button_save");
+
+        this.buttonLoad.disabled = false;
+        this.buttonConvert.disabled = true;
+        this.buttonSave.disabled = true;
     }
 
     private openFile() {
