@@ -5,8 +5,9 @@
   "main": "app/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./node_modules/.bin/electron .",
-    "build": "gulp build"
+    "start": "$(npm bin)/electron .",
+    "build": "$(npm bin)/gulp build",
+    "clean": "$(npm bin)/gulp clean"
   },
   "author": "Takehiko YOSHIDA",
   "license": "MIT",
