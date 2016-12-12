@@ -1,19 +1,21 @@
 {
-  "name": "typescript_electron_app",
+  "name": "PazuCraft",
   "version": "0.1.0",
-  "description": "Electron App with TypeScript",
+  "description": "Creating Development View for Paper Craft with Spherical Image",
   "main": "app/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "$(npm bin)/electron .",
     "build": "$(npm bin)/gulp build",
-    "clean": "$(npm bin)/gulp clean"
+    "clean": "$(npm bin)/gulp clean",
+    "package:app": "$(npm bin)/electron-packager . PazuCraft --platform=darwin --arch=x64 --version=1.4.12 --ignore='(src|gulpfile.js|(node_modules/(electron|electron-packager)))' --overwrite --out='../' --asar=true"
   },
   "author": "Takehiko YOSHIDA",
   "license": "MIT",
   "devDependencies": {
     "del": "^2.2.2",
     "electron": "^1.4.12",
+    "electron-packager": "^8.4.0",
     "gulp": "^3.9.1",
     "gulp-typescript": "^3.1.3",
     "typescript": "^2.1.4"
