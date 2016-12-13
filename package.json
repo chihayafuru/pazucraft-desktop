@@ -1,5 +1,5 @@
 {
-  "name": "PazuCraft",
+  "name": "pazucraft",
   "version": "0.1.0",
   "description": "Creating Development View for Paper Craft with Spherical Image",
   "main": "app/main.js",
