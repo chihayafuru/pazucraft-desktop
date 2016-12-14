@@ -22,5 +22,13 @@
   },
   "dependencies": {
     "@types/electron": "^1.4.29"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chihayafuru/pazucraft-desktop.git"
+  },
+  "keywords": [
+    "Spherical Image",
+    "Electron"
+  ]
 }
