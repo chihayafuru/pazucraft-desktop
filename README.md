@@ -25,6 +25,11 @@
   4. Print the converted image with your favourite app
 
 
+## How to make a paper craft
+
+  [How to make a paper craft](https://www.chihayafuru.jp/pazucraft/howtouse_en.html)
+
+
 ## Installation
 
   1. npm install
