@@ -5,11 +5,17 @@
     <title>PazuCraft</title>
   </head>
   <body bgcolor="#CCCCCC">
-    <div=id="fixed_header">
+    <form id="fixed_header">
 	    <button type="button" disabled="false" id="button_load"/>Load</button>
 	    <button type="button" disabled="true" id="button_convert"/>Convert</button>
 	    <button type="button" disabled="true" id="button_save"/>Save</button>
-    </div>
+      &nbsp;&nbsp;
+      line color:
+        <label><input type="radio" name="line_color" id="line_none" value="none">none</label>
+        <label><input type="radio" name="line_color" id="line_white" value="white">white</label>
+        <label><input type="radio" name="line_color" id="line_black" value="black">black</label>
+        <label><input type="radio" name="line_color" id="line_aqua" value="aqua" checked>aqua</label>
+    </form>
     <br><br>
     <div id="content">
 		  <canvas id="srcCanvas" hidden="true"></canvas>

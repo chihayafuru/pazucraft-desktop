@@ -7,6 +7,9 @@ module AppConst {
 
 class Development {
 
+    public drawLines : boolean
+    public lineStyle : string = "rgba(255,255,255,0)"
+
     private srcCanvas : HTMLCanvasElement
     private dstCanvas : HTMLCanvasElement
 
@@ -80,10 +83,15 @@ class Development {
         var floorCanvas = this.floorCanvas(transformedCanvas)
         var compositeCanvas = this.compositeCanvas(transformedCanvas, ceilCanvas, floorCanvas)
 
-        var markedCanvas = this.markedCanvas(compositeCanvas, "rgba(0,255,255,128)")
-
         var dstImg :HTMLImageElement = new Image()
-        dstImg.src = markedCanvas.toDataURL("image/png")
+
+        if (this.drawLines) {
+            var markedCanvas = this.markedCanvas(compositeCanvas, this.lineStyle)
+            dstImg.src = markedCanvas.toDataURL("image/png")
+
+        } else {
+            dstImg.src = compositeCanvas.toDataURL("image/png")
+        }
 
         dstImg.onload = (e) => {
             this.dstCtx.clearRect(0, 0, AppConst.canvasWidth, AppConst.canvasHeight)

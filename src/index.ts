@@ -128,14 +128,48 @@ class StartUp {
     }
 
     private convertImage() {
+        let drawLines : boolean;
+        let lineStyle : string;
+        let colorButtons = document.getElementsByName("line_color")
+
+        for (var i = 0 ; i < colorButtons.length ; i++) {
+            let btn = <HTMLInputElement>colorButtons[i]
+            if (btn.checked) {
+                switch (btn.id) {
+                    case "line_white":
+                        drawLines = true;
+                        lineStyle = "rgba(255,255,255,128)"
+                        console.log("white");
+                        break;
+                    case "line_black":
+                        drawLines = true;
+                        lineStyle = "rgba(0,0,0,128)"
+                        console.log("black");
+                        break;
+                    case "line_aqua":
+                        drawLines = true;
+                        lineStyle = "rgba(0,255,255,128)"
+                        console.log("aqua");
+                        break;
+                    case "line_none":
+                    default:
+                        drawLines = false;
+                        lineStyle = "rgba(255,255,255,0)"
+                        console.log("none");
+                        break;
+                }
+            }
+        }
+
+
         const modalPath = path.join('file://', __dirname, 'modal.html');
         this.modalWindow = new remote.BrowserWindow({parent: this.browserWindow, frame: false, modal: true, transparent: true, resizable:false, alwaysOnTop: true});
         this.modalWindow.loadURL(modalPath);
         this.modalWindow.show();
         const id = remote.powerSaveBlocker.start('prevent-app-suspension');
+        this.development.drawLines = drawLines;
+        this.development.lineStyle = lineStyle;
         this.development.convertImage( (e) => {
-            this.buttonConvert.disabled = true;
-            this.menuConvert.enabled = false;
             this.buttonSave.disabled = false;
             this.menuSave.enabled = true;
             remote.powerSaveBlocker.stop(id);
