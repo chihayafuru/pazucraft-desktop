@@ -14,8 +14,7 @@ class MainApp {
     }
 
     onReady(){
-        this.mainWindow = new BrowserWindow({width: 760, height: 580, resizable: false});
-
+        this.mainWindow = new BrowserWindow({width: 760, height: 630, resizable: false});
         this.mainWindow.loadURL(`file://${__dirname}/index.html`);
 
         this.mainWindow.on('closed', () => {
