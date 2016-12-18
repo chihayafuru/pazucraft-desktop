@@ -8,7 +8,8 @@
     "start": "$(npm bin)/electron .",
     "build": "$(npm bin)/gulp build",
     "clean": "$(npm bin)/gulp clean",
-    "package:app": "$(npm bin)/electron-packager . PazuCraft --platform=darwin,win32,linux --arch=x64 --version=1.4.12 --ignore='(src|gulpfile.js|(node_modules/(electron|electron-packager)))' --overwrite --out='../' --asar=true"
+    "package:win": "electron-packager . PazuCraft --platform=win32 --arch=x64 --version=1.4.12 --overwrite --asar=true",
+    "package:mac": "$(npm bin)/electron-packager . PazuCraft --platform=darwin --arch=x64 --version=1.4.12 --ignore='(src|gulpfile.js|(node_modules/(electron|electron-packager)))' --overwrite --out='../' --asar=true"
   },
   "author": "Takehiko YOSHIDA",
   "license": "MIT",
