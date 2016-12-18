@@ -163,7 +163,7 @@ class StartUp {
 
 
         const modalPath = path.join('file://', __dirname, 'modal.html');
-        this.modalWindow = new remote.BrowserWindow({parent: this.browserWindow, frame: false, modal: true, transparent: true, resizable:false, alwaysOnTop: true});
+        this.modalWindow = new remote.BrowserWindow({frame: false, modal: true, transparent: true, resizable:false, alwaysOnTop: true});
         this.modalWindow.loadURL(modalPath);
         this.modalWindow.show();
         const id = remote.powerSaveBlocker.start('prevent-app-suspension');
