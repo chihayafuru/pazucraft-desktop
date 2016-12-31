@@ -53,11 +53,17 @@ class Development {
 
         srcImg.onload = (e) => {
             console.log("success to load image: " + e)
-            this.srcCtx.clearRect(0, 0, AppConst.canvasWidth, AppConst.canvasHeight)
-            this.srcCtx.drawImage(srcImg, 0, 0, srcImg.width, srcImg.height, 0, 0, AppConst.canvasWidth, AppConst.canvasHeight)
-            this.srcCanvas.hidden = false
-            this.srcImg = srcImg
-            onload(e);
+
+            if (srcImg.width == (srcImg.height * 2)) {
+                this.srcCtx.clearRect(0, 0, AppConst.canvasWidth, AppConst.canvasHeight)
+                this.srcCtx.drawImage(srcImg, 0, 0, srcImg.width, srcImg.height, 0, 0, AppConst.canvasWidth, AppConst.canvasHeight)
+                this.srcCanvas.hidden = false
+                this.srcImg = srcImg
+                onload(e);
+            } else {
+                let e : Event = new CustomEvent("not supported format", null);
+                onerror(e);
+            }
         }
 
         srcImg.onerror = (e) => {

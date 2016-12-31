@@ -120,7 +120,12 @@ class StartUp {
                                         this.menuSave.enabled = false;
                                     },
                                     function(e) {
-                                        console.log("fail to load file!!!");
+                                        console.log(e);
+                                        if (e.type == "not supported format") {
+                                            alert(fileNames[0] + ' is not supported format');
+                                        } else {
+                                            alert('Fail to load the file : ' + fileNames[0]);
+                                        }
                                     }
             );
             }
