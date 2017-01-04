@@ -124,7 +124,7 @@ class Development {
         return true
     }
 
-    public keystone(ctx:CanvasRenderingContext2D, img:HTMLImageElement, x:number, y:number, width:number, height:number, upper:number, lower:number) {
+    public triangle(ctx:CanvasRenderingContext2D, img:HTMLImageElement, x:number, y:number, width:number, height:number, upper:number, lower:number) {
 
         for (let n = 0 ; n < height ; n++) {
             let sx = x
@@ -140,6 +140,26 @@ class Development {
         }
     }
 
+    public keystone(ctx:CanvasRenderingContext2D, img:HTMLImageElement, x:number, y:number, width:number, height:number, upper:number, lower:number) {
+
+        for (let n = 0 ; n < height ; n++) {
+            let sx = x
+            let sy = y + n
+            let sWidth = width
+            let sHeight = 1
+            let dWidth = width * (upper*(height-n) + lower*n) / height
+            let dx = x + (sWidth - dWidth) / 2
+            let dHeight = 1
+            let dy = y + n
+
+            ctx.drawImage(img, sx, sy, sWidth, sHeight, dx,   dy, dWidth, dHeight)
+        }
+    }
+
+    public squre(ctx:CanvasRenderingContext2D, img:HTMLImageElement, x:number, y:number, width:number, height:number) {
+        ctx.drawImage(img, x, y, width, height, x, y, width, height);
+    }
+
     public transformedCanvas() : HTMLCanvasElement {
         let scale = Math.sqrt(2) - 1
 
@@ -150,11 +170,11 @@ class Development {
         let transformedCtx : CanvasRenderingContext2D = <CanvasRenderingContext2D>transformedCanvas.getContext('2d', { storage: "discardable" })
 
         for (let row = 0 ; row < 8 ; row++) {
-            this.keystone(transformedCtx, this.srcImg, this.unit*row*2, this.unit*0, this.unit*2, this.unit*1, 0.01,  scale+0.01)
-            this.keystone(transformedCtx, this.srcImg, this.unit*row*2, this.unit*1, this.unit*2, this.unit*2, scale, 1.0  )
-            this.keystone(transformedCtx, this.srcImg, this.unit*row*2, this.unit*3, this.unit*2, this.unit*2, 1.0,   1.0  )
-            this.keystone(transformedCtx, this.srcImg, this.unit*row*2, this.unit*5, this.unit*2, this.unit*2, 1.0,   scale)
-            this.keystone(transformedCtx, this.srcImg, this.unit*row*2, this.unit*7, this.unit*2, this.unit*1, scale+0.01, 0.01)
+            this.triangle(transformedCtx, this.srcImg, this.unit*row*2, this.unit*0, this.unit*2, this.unit*1, 0.01, scale+0.01)
+            this.keystone(transformedCtx, this.srcImg, this.unit*row*2, this.unit*1, this.unit*2, this.unit*2, scale, 1.0      )
+            this.squre(   transformedCtx, this.srcImg, this.unit*row*2, this.unit*3, this.unit*2, this.unit*2                  )
+            this.keystone(transformedCtx, this.srcImg, this.unit*row*2, this.unit*5, this.unit*2, this.unit*2, 1.0,   scale    )
+            this.triangle(transformedCtx, this.srcImg, this.unit*row*2, this.unit*7, this.unit*2, this.unit*1, scale+0.01, 0.01)
         }
 
         return transformedCanvas
@@ -199,6 +219,46 @@ class Development {
 
         let ctx : CanvasRenderingContext2D = <CanvasRenderingContext2D>markedCanvas.getContext('2d', { storage: "discardable" })
 
+        if (this.drawCeilLines) {
+            ctx.save()
+            ctx.translate(this.unit, this.unit)
+            ctx.beginPath()
+            ctx.strokeStyle = strokeStyle
+            ctx.setLineDash([10, 30])
+            ctx.lineCap = "round"
+            ctx.lineWidth = 16
+            ctx.moveTo(this.unit*(1-scale), this.unit*2        )
+            ctx.lineTo(this.unit*0,         this.unit*(1+scale))
+            ctx.lineTo(this.unit*0,         this.unit*(1-scale))
+            ctx.lineTo(this.unit*(1-scale), 0                  )
+            ctx.lineTo(this.unit*(1+scale), 0                  )
+            ctx.lineTo(this.unit*2,         this.unit*(1-scale))
+            ctx.lineTo(this.unit*2,         this.unit*(1+scale))
+            ctx.lineTo(this.unit*(1+scale), this.unit*2        )
+            ctx.stroke()
+            ctx.restore()
+        }
+
+        if (this.drawFloorLines) {
+            ctx.save()
+            ctx.translate(this.unit, this.unit*9)
+            ctx.beginPath()
+            ctx.strokeStyle = strokeStyle
+            ctx.setLineDash([10, 30])
+            ctx.lineCap = "round"
+            ctx.lineWidth = 16
+            ctx.moveTo(this.unit*(1-scale), 0                  )
+            ctx.lineTo(this.unit*0,         this.unit*(1-scale))
+            ctx.lineTo(this.unit*0,         this.unit*(1+scale))
+            ctx.lineTo(this.unit*(1-scale), this.unit*2        )
+            ctx.lineTo(this.unit*(1+scale), this.unit*2        )
+            ctx.lineTo(this.unit*2,         this.unit*(1+scale))
+            ctx.lineTo(this.unit*2,         this.unit*(1-scale))
+            ctx.lineTo(this.unit*(1+scale), 0                  )
+            ctx.stroke()
+            ctx.restore()
+        }
+
         for (var row = 0 ; row < 8 ; row++) {
             ctx.save()
             ctx.translate(this.unit*(1+row*2), this.unit*3)
@@ -229,6 +289,7 @@ class Development {
             ctx.restore()
         }
 
+        // right margin of equator
         ctx.save()
         ctx.translate(this.unit*17, this.unit*5)
         ctx.beginPath()
@@ -236,8 +297,22 @@ class Development {
         ctx.lineCap = "round"
         ctx.lineWidth = 6
         ctx.moveTo(0             , 0          )
-        ctx.lineTo(this.unit/8   , 0          )
-        ctx.lineTo(this.unit/8   , this.unit*2)
+        ctx.lineTo(this.unit/4   , 0          )
+        ctx.lineTo(this.unit/4   , this.unit*2)
+        ctx.lineTo(0             , this.unit*2)
+        ctx.stroke()
+        ctx.restore()
+
+        // left margin of equator
+        ctx.save()
+        ctx.translate(this.unit*1, this.unit*5)
+        ctx.beginPath()
+        ctx.strokeStyle = strokeStyle
+        ctx.lineCap = "round"
+        ctx.lineWidth = 6
+        ctx.moveTo(0             , 0          )
+        ctx.lineTo(-this.unit/4  , 0          )
+        ctx.lineTo(-this.unit/4  , this.unit*2)
         ctx.lineTo(0             , this.unit*2)
         ctx.stroke()
         ctx.restore()
@@ -278,47 +353,35 @@ class Development {
             ctx.restore()
         }
 
+        for (var row = 0 ; row <= 8 ; row++) {
+            ctx.save()
+            ctx.translate(this.unit*(1+row*2), this.unit*4)
+            ctx.beginPath()
+            ctx.strokeStyle = strokeStyle
+            ctx.setLineDash([8, 16, 48, 16])
+            ctx.lineCap = "round"
+            ctx.lineWidth = 8
+            ctx.moveTo(0             , 0          )
+            ctx.lineTo(0             , this.unit*1)
+            ctx.stroke()
+            ctx.restore()
+        }
+
+        for (var row = 0 ; row <= 8 ; row++) {
+            ctx.save()
+            ctx.translate(this.unit*(1+row*2), this.unit*7)
+            ctx.beginPath()
+            ctx.strokeStyle = strokeStyle
+            ctx.setLineDash([8, 16, 48, 16])
+            ctx.lineCap = "round"
+            ctx.lineWidth = 8
+            ctx.moveTo(0             , 0          )
+            ctx.lineTo(0             , this.unit*1)
+            ctx.stroke()
+            ctx.restore()
+        }
+
         ctx.drawImage(originalCanvas, 0, 0)
-
-        if (this.drawCeilLines) {
-            ctx.save()
-            ctx.translate(this.unit, this.unit)
-            ctx.beginPath()
-            ctx.strokeStyle = strokeStyle
-            ctx.setLineDash([10, 30])
-            ctx.lineCap = "round"
-            ctx.lineWidth = 8
-            ctx.moveTo(this.unit*(1-scale), this.unit*2        )
-            ctx.lineTo(this.unit*0,         this.unit*(1+scale))
-            ctx.lineTo(this.unit*0,         this.unit*(1-scale))
-            ctx.lineTo(this.unit*(1-scale), 0                  )
-            ctx.lineTo(this.unit*(1+scale), 0                  )
-            ctx.lineTo(this.unit*2,         this.unit*(1-scale))
-            ctx.lineTo(this.unit*2,         this.unit*(1+scale))
-            ctx.lineTo(this.unit*(1+scale), this.unit*2        )
-            ctx.stroke()
-            ctx.restore()
-        }
-
-        if (this.drawFloorLines) {
-            ctx.save()
-            ctx.translate(this.unit, this.unit*9)
-            ctx.beginPath()
-            ctx.strokeStyle = strokeStyle
-            ctx.setLineDash([10, 30])
-            ctx.lineCap = "round"
-            ctx.lineWidth = 8
-            ctx.moveTo(this.unit*(1-scale), 0                  )
-            ctx.lineTo(this.unit*0,         this.unit*(1-scale))
-            ctx.lineTo(this.unit*0,         this.unit*(1+scale))
-            ctx.lineTo(this.unit*(1-scale), this.unit*2        )
-            ctx.lineTo(this.unit*(1+scale), this.unit*2        )
-            ctx.lineTo(this.unit*2,         this.unit*(1+scale))
-            ctx.lineTo(this.unit*2,         this.unit*(1-scale))
-            ctx.lineTo(this.unit*(1+scale), 0                  )
-            ctx.stroke()
-            ctx.restore()
-        }
 
         if (this.drawTropicOfCancer) {
             ctx.save()
@@ -398,34 +461,6 @@ class Development {
                 ctx.stroke()
                 ctx.restore()
             }
-        }
-
-        for (var row = 0 ; row <= 8 ; row++) {
-            ctx.save()
-            ctx.translate(this.unit*(1+row*2), this.unit*3)
-            ctx.beginPath()
-            ctx.strokeStyle = strokeStyle
-            ctx.setLineDash([10, 30])
-            ctx.lineCap = "round"
-            ctx.lineWidth = 8
-            ctx.moveTo(0             , 0          )
-            ctx.lineTo(0             , this.unit*2)
-            ctx.stroke()
-            ctx.restore()
-        }
-
-        for (var row = 0 ; row <= 8 ; row++) {
-            ctx.save()
-            ctx.translate(this.unit*(1+row*2), this.unit*7)
-            ctx.beginPath()
-            ctx.strokeStyle = strokeStyle
-            ctx.setLineDash([10, 30])
-            ctx.lineCap = "round"
-            ctx.lineWidth = 8
-            ctx.moveTo(0             , 0          )
-            ctx.lineTo(0             , this.unit*2)
-            ctx.stroke()
-            ctx.restore()
         }
 
         return markedCanvas
