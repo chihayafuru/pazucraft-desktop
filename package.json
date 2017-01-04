@@ -1,6 +1,6 @@
 {
   "name": "pazucraft",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Creating Development View for Paper Craft with Spherical Image",
   "main": "app/main.js",
   "scripts": {
