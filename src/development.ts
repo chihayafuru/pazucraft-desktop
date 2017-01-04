@@ -21,6 +21,14 @@ class Development {
 
     private unit : number
 
+    private drawCeilLines : Boolean = true
+    private drawFloorLines : Boolean = true
+    private drawTropicOfCancer : Boolean = false
+    private drawTropicOfCapricorn : Boolean = false
+    private drawArcticCircle : Boolean = false
+    private drawAntarcticCicle : Boolean = false
+    private drawMeridian : Boolean = false
+
     constructor() {
         this.srcCanvas = <HTMLCanvasElement>document.getElementById('srcCanvas')
         if (this.srcCanvas) {
@@ -272,101 +280,129 @@ class Development {
 
         ctx.drawImage(originalCanvas, 0, 0)
 
-        ctx.save()
-        ctx.translate(this.unit, this.unit)
-        ctx.beginPath()
-        ctx.strokeStyle = strokeStyle
-        ctx.setLineDash([10, 30])
-        ctx.lineCap = "round"
-        ctx.lineWidth = 8
-        ctx.moveTo(this.unit*(1-scale), this.unit*2        )
-        ctx.lineTo(this.unit*0,         this.unit*(1+scale))
-        ctx.lineTo(this.unit*0,         this.unit*(1-scale))
-        ctx.lineTo(this.unit*(1-scale), 0                  )
-        ctx.lineTo(this.unit*(1+scale), 0                  )
-        ctx.lineTo(this.unit*2,         this.unit*(1-scale))
-        ctx.lineTo(this.unit*2,         this.unit*(1+scale))
-        ctx.lineTo(this.unit*(1+scale), this.unit*2        )
-        ctx.stroke()
-        ctx.restore()
-
-        ctx.save()
-        ctx.translate(this.unit, this.unit*9)
-        ctx.beginPath()
-        ctx.strokeStyle = strokeStyle
-        ctx.setLineDash([10, 30])
-        ctx.lineCap = "round"
-        ctx.lineWidth = 8
-        ctx.moveTo(this.unit*(1-scale), 0                  )
-        ctx.lineTo(this.unit*0,         this.unit*(1-scale))
-        ctx.lineTo(this.unit*0,         this.unit*(1+scale))
-        ctx.lineTo(this.unit*(1-scale), this.unit*2        )
-        ctx.lineTo(this.unit*(1+scale), this.unit*2        )
-        ctx.lineTo(this.unit*2,         this.unit*(1+scale))
-        ctx.lineTo(this.unit*2,         this.unit*(1-scale))
-        ctx.lineTo(this.unit*(1+scale), 0                  )
-        ctx.stroke()
-        ctx.restore()
-
-        ctx.save()
-        ctx.translate(this.unit, this.unit*5)
-        ctx.beginPath()
-        ctx.strokeStyle = strokeStyle
-        ctx.setLineDash([10, 30])
-        ctx.lineCap = "round"
-        ctx.lineWidth = 8
-        ctx.moveTo(this.unit*0        , 0             )
-        ctx.lineTo(this.unit*16       , 0             )
-        ctx.stroke()
-        ctx.restore()
-
-        ctx.save()
-        ctx.translate(this.unit, this.unit*7)
-        ctx.beginPath()
-        ctx.strokeStyle = strokeStyle
-        ctx.setLineDash([10, 30])
-        ctx.lineCap = "round"
-        ctx.lineWidth = 8
-        ctx.moveTo(this.unit*0        , 0             )
-        ctx.lineTo(this.unit*16       , 0             )
-        ctx.stroke()
-        ctx.restore()
-
-        for (var row = 0 ; row < 8 ; row++) {
+        if (this.drawCeilLines) {
             ctx.save()
-            ctx.translate(this.unit*(1+row*2), this.unit*5)
+            ctx.translate(this.unit, this.unit)
             ctx.beginPath()
             ctx.strokeStyle = strokeStyle
             ctx.setLineDash([10, 30])
             ctx.lineCap = "round"
             ctx.lineWidth = 8
-            ctx.moveTo(0                  ,  0          )
-            ctx.lineTo(this.unit*(1-scale), -this.unit*2)
-            ctx.lineTo(this.unit*(1+scale), -this.unit*2)
-            ctx.lineTo(this.unit*2        ,  0          )
+            ctx.moveTo(this.unit*(1-scale), this.unit*2        )
+            ctx.lineTo(this.unit*0,         this.unit*(1+scale))
+            ctx.lineTo(this.unit*0,         this.unit*(1-scale))
+            ctx.lineTo(this.unit*(1-scale), 0                  )
+            ctx.lineTo(this.unit*(1+scale), 0                  )
+            ctx.lineTo(this.unit*2,         this.unit*(1-scale))
+            ctx.lineTo(this.unit*2,         this.unit*(1+scale))
+            ctx.lineTo(this.unit*(1+scale), this.unit*2        )
             ctx.stroke()
             ctx.restore()
         }
 
-        for (var row = 0 ; row < 8 ; row++) {
+        if (this.drawFloorLines) {
             ctx.save()
-            ctx.translate(this.unit*(1+row*2), this.unit*7)
+            ctx.translate(this.unit, this.unit*9)
             ctx.beginPath()
             ctx.strokeStyle = strokeStyle
             ctx.setLineDash([10, 30])
             ctx.lineCap = "round"
             ctx.lineWidth = 8
-            ctx.moveTo(0                  , 0          )
-            ctx.lineTo(this.unit*(1-scale), this.unit*2)
-            ctx.lineTo(this.unit*(1+scale), this.unit*2)
-            ctx.lineTo(this.unit*2        , 0          )
+            ctx.moveTo(this.unit*(1-scale), 0                  )
+            ctx.lineTo(this.unit*0,         this.unit*(1-scale))
+            ctx.lineTo(this.unit*0,         this.unit*(1+scale))
+            ctx.lineTo(this.unit*(1-scale), this.unit*2        )
+            ctx.lineTo(this.unit*(1+scale), this.unit*2        )
+            ctx.lineTo(this.unit*2,         this.unit*(1+scale))
+            ctx.lineTo(this.unit*2,         this.unit*(1-scale))
+            ctx.lineTo(this.unit*(1+scale), 0                  )
             ctx.stroke()
             ctx.restore()
+        }
+
+        if (this.drawTropicOfCancer) {
+            ctx.save()
+            ctx.translate(this.unit, this.unit*5)
+            ctx.beginPath()
+            ctx.strokeStyle = strokeStyle
+            ctx.setLineDash([10, 30])
+            ctx.lineCap = "round"
+            ctx.lineWidth = 8
+            ctx.moveTo(this.unit*0        , 0             )
+            ctx.lineTo(this.unit*16       , 0             )
+            ctx.stroke()
+            ctx.restore()
+        }
+
+        if (this.drawTropicOfCapricorn) {
+            ctx.save()
+            ctx.translate(this.unit, this.unit*7)
+            ctx.beginPath()
+            ctx.strokeStyle = strokeStyle
+            ctx.setLineDash([10, 30])
+            ctx.lineCap = "round"
+            ctx.lineWidth = 8
+            ctx.moveTo(this.unit*0        , 0             )
+            ctx.lineTo(this.unit*16       , 0             )
+            ctx.stroke()
+            ctx.restore()
+        }
+
+        if (this.drawArcticCircle) {
+            for (var row = 0 ; row < 8 ; row++) {
+                ctx.save()
+                ctx.translate(this.unit*(1+row*2), this.unit*5)
+                ctx.beginPath()
+                ctx.strokeStyle = strokeStyle
+                ctx.setLineDash([10, 30])
+                ctx.lineCap = "round"
+                ctx.lineWidth = 8
+                ctx.moveTo(0                  ,  0          )
+                ctx.lineTo(this.unit*(1-scale), -this.unit*2)
+                ctx.lineTo(this.unit*(1+scale), -this.unit*2)
+                ctx.lineTo(this.unit*2        ,  0          )
+                ctx.stroke()
+                ctx.restore()
+            }
+        }
+
+        if (this.drawAntarcticCicle) {
+            for (var row = 0 ; row < 8 ; row++) {
+                ctx.save()
+                ctx.translate(this.unit*(1+row*2), this.unit*7)
+                ctx.beginPath()
+                ctx.strokeStyle = strokeStyle
+                ctx.setLineDash([10, 30])
+                ctx.lineCap = "round"
+                ctx.lineWidth = 8
+                ctx.moveTo(0                  , 0          )
+                ctx.lineTo(this.unit*(1-scale), this.unit*2)
+                ctx.lineTo(this.unit*(1+scale), this.unit*2)
+                ctx.lineTo(this.unit*2        , 0          )
+                ctx.stroke()
+                ctx.restore()
+            }
+        }
+
+        if (this.drawMeridian) {
+            for (var row = 0 ; row <= 8 ; row++) {
+                ctx.save()
+                ctx.translate(this.unit*(1+row*2), this.unit*5)
+                ctx.beginPath()
+                ctx.strokeStyle = strokeStyle
+                ctx.setLineDash([10, 30])
+                ctx.lineCap = "round"
+                ctx.lineWidth = 8
+                ctx.moveTo(0             , 0          )
+                ctx.lineTo(0             , this.unit*2)
+                ctx.stroke()
+                ctx.restore()
+            }
         }
 
         for (var row = 0 ; row <= 8 ; row++) {
             ctx.save()
-            ctx.translate(this.unit*(1+row*2), this.unit*5)
+            ctx.translate(this.unit*(1+row*2), this.unit*3)
             ctx.beginPath()
             ctx.strokeStyle = strokeStyle
             ctx.setLineDash([10, 30])
@@ -377,7 +413,21 @@ class Development {
             ctx.stroke()
             ctx.restore()
         }
-        
+
+        for (var row = 0 ; row <= 8 ; row++) {
+            ctx.save()
+            ctx.translate(this.unit*(1+row*2), this.unit*7)
+            ctx.beginPath()
+            ctx.strokeStyle = strokeStyle
+            ctx.setLineDash([10, 30])
+            ctx.lineCap = "round"
+            ctx.lineWidth = 8
+            ctx.moveTo(0             , 0          )
+            ctx.lineTo(0             , this.unit*2)
+            ctx.stroke()
+            ctx.restore()
+        }
+
         return markedCanvas
     }
 
