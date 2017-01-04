@@ -19,6 +19,8 @@ class Development {
     private srcImg : HTMLImageElement
     private dstImg : HTMLImageElement
 
+    private unit : number
+
     constructor() {
         this.srcCanvas = <HTMLCanvasElement>document.getElementById('srcCanvas')
         if (this.srcCanvas) {
@@ -54,11 +56,12 @@ class Development {
         srcImg.onload = (e) => {
             console.log("success to load image: " + e)
 
-            if (srcImg.width == (srcImg.height * 2)) {
+            if (srcImg.width === (srcImg.height * 2)) {
                 this.srcCtx.clearRect(0, 0, AppConst.canvasWidth, AppConst.canvasHeight)
                 this.srcCtx.drawImage(srcImg, 0, 0, srcImg.width, srcImg.height, 0, 0, AppConst.canvasWidth, AppConst.canvasHeight)
                 this.srcCanvas.hidden = false
                 this.srcImg = srcImg
+                this.unit = srcImg.width / 16
                 onload(e);
             } else {
                 let e : Event = new CustomEvent("not supported format", null);
@@ -83,18 +86,21 @@ class Development {
         this.srcCanvas.hidden = true
         this.dstCanvas.hidden = true
 
-        var transformedCanvas : HTMLCanvasElement = this.transformedCanvas()
+        let transformedCanvas : HTMLCanvasElement = this.transformedCanvas()
+        let compositeCanvas : HTMLCanvasElement = document.createElement('canvas',);
+        compositeCanvas.width = this.unit * 18;
+        compositeCanvas.height = this.unit * 12;
+        let compositeCtx : CanvasRenderingContext2D = <CanvasRenderingContext2D>compositeCanvas.getContext('2d', { storage: "discardable" })
 
-        var ceilCanvas = this.ceilCanvas(transformedCanvas)
-        var floorCanvas = this.floorCanvas(transformedCanvas)
-        var compositeCanvas = this.compositeCanvas(transformedCanvas, ceilCanvas, floorCanvas)
+        this.drawCeil(transformedCanvas, compositeCtx);
+        this.drawFloor(transformedCanvas, compositeCtx);
+        this.drawWall(transformedCanvas, compositeCtx);
 
-        var dstImg :HTMLImageElement = new Image()
+        let dstImg :HTMLImageElement = new Image()
 
         if (this.drawLines) {
-            var markedCanvas = this.markedCanvas(compositeCanvas, this.lineStyle)
+            let markedCanvas = this.markedCanvas(compositeCanvas, this.lineStyle)
             dstImg.src = markedCanvas.toDataURL("image/png")
-
         } else {
             dstImg.src = compositeCanvas.toDataURL("image/png")
         }
@@ -112,180 +118,154 @@ class Development {
 
     public keystone(ctx:CanvasRenderingContext2D, img:HTMLImageElement, x:number, y:number, width:number, height:number, upper:number, lower:number) {
 
-        for (var n = 0 ; n < height ; n++) {
-            var sx = x
-            var sy = y + n
-            var sWidth = width
-            var sHeight = 1
-            var dWidth = width * (upper*(height-n) + lower*n) / height
-            var dx = x + (sWidth - dWidth) / 2
-            var dHeight = 1
-            var dy = y + n
+        for (let n = 0 ; n < height ; n++) {
+            let sx = x
+            let sy = y + n
+            let sWidth = width
+            let sHeight = 1
+            let dWidth = width * (upper*(height-n) + lower*n) / height
+            let dx = x + (sWidth - dWidth) / 2
+            let dHeight = 1
+            let dy = y + n
 
             ctx.drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
         }
     }
 
     public transformedCanvas() : HTMLCanvasElement {
-        var unit = this.srcImg.width / 16
-        var scale = Math.sqrt(2) - 1
+        let scale = Math.sqrt(2) - 1
 
-        var transformedCanvas : HTMLCanvasElement = document.createElement('canvas')
+        let transformedCanvas : HTMLCanvasElement = document.createElement('canvas')
         transformedCanvas.width = this.srcImg.width
         transformedCanvas.height = this.srcImg.height
 
-        var transformedCtx : CanvasRenderingContext2D = transformedCanvas.getContext('2d')
+        let transformedCtx : CanvasRenderingContext2D = <CanvasRenderingContext2D>transformedCanvas.getContext('2d', { storage: "discardable" })
 
-        for (var row = 0 ; row < 8 ; row++) {
-            this.keystone(transformedCtx, this.srcImg, unit*row*2, unit*0, unit*2, unit*1, 0.02,   scale+0.01)
-            this.keystone(transformedCtx, this.srcImg, unit*row*2, unit*1, unit*2, unit*2, scale, 1.0  )
-            this.keystone(transformedCtx, this.srcImg, unit*row*2, unit*3, unit*2, unit*2, 1.0,   1.0  )
-            this.keystone(transformedCtx, this.srcImg, unit*row*2, unit*5, unit*2, unit*2, 1.0,   scale)
-            this.keystone(transformedCtx, this.srcImg, unit*row*2, unit*7, unit*2, unit*1, scale+0.01, 0.02  )
+        for (let row = 0 ; row < 8 ; row++) {
+            this.keystone(transformedCtx, this.srcImg, this.unit*row*2, this.unit*0, this.unit*2, this.unit*1, 0.01,  scale+0.01)
+            this.keystone(transformedCtx, this.srcImg, this.unit*row*2, this.unit*1, this.unit*2, this.unit*2, scale, 1.0  )
+            this.keystone(transformedCtx, this.srcImg, this.unit*row*2, this.unit*3, this.unit*2, this.unit*2, 1.0,   1.0  )
+            this.keystone(transformedCtx, this.srcImg, this.unit*row*2, this.unit*5, this.unit*2, this.unit*2, 1.0,   scale)
+            this.keystone(transformedCtx, this.srcImg, this.unit*row*2, this.unit*7, this.unit*2, this.unit*1, scale+0.01, 0.01)
         }
 
         return transformedCanvas
     }
 
-    public ceilCanvas(srcCanvas : HTMLCanvasElement) : HTMLCanvasElement {
-        var unit = srcCanvas.width / 16
-
-        var canvas : HTMLCanvasElement = document.createElement('canvas')
-        canvas.width = unit * 2
-        canvas.height = unit * 2
-        var ctx : CanvasRenderingContext2D = canvas.getContext('2d')
-
-        for (var col = 0 ; col < 8 ; col++) {
-            ctx.save()
-            ctx.translate(unit, unit)
-            ctx.rotate(-Math.PI*col/4)
-            ctx.drawImage(srcCanvas, unit*2*col, 0, unit*2, unit, -unit, 0, unit*2, unit)
-            ctx.restore()
+    public drawCeil(srcCanvas : HTMLCanvasElement, dstCtx : CanvasRenderingContext2D) : void {
+        for (let col = 0 ; col < 8 ; col++) {
+            dstCtx.save()
+            dstCtx.translate(this.unit*2, this.unit*2)
+            dstCtx.rotate(-Math.PI*col/4)
+            dstCtx.drawImage(srcCanvas,
+                          this.unit*2*col, 0, this.unit*2, this.unit,
+                         -this.unit,       0, this.unit*2, this.unit)
+            dstCtx.restore()
         }
-
-        return canvas
     }
 
-    public floorCanvas(srcCanvas : HTMLCanvasElement) : HTMLCanvasElement {
-        var unit = srcCanvas.width / 16
-
-        var canvas : HTMLCanvasElement = document.createElement('canvas')
-        canvas.width = unit * 2
-        canvas.height = unit * 2
-        var ctx : CanvasRenderingContext2D = canvas.getContext('2d')
-
-        for (var col = 0 ; col < 8 ; col++) {
-            ctx.save()
-            ctx.translate(unit, unit)
-            ctx.rotate(Math.PI*col/4)
-            ctx.drawImage(srcCanvas, unit*2*col, unit*7, unit*2, unit, -unit, -unit, unit*2, unit)
-            ctx.restore()
+    public drawFloor(srcCanvas : HTMLCanvasElement, dstCtx : CanvasRenderingContext2D) : void {
+        for (let col = 0 ; col < 8 ; col++) {
+            dstCtx.save()
+            dstCtx.translate(this.unit*2, this.unit*10)
+            dstCtx.rotate(Math.PI*col/4)
+            dstCtx.drawImage(srcCanvas,
+                          this.unit*2*col,  this.unit*7, this.unit*2, this.unit,
+                         -this.unit,       -this.unit,   this.unit*2, this.unit)
+            dstCtx.restore()
         }
-        
-        return canvas
     }
 
-    public compositeCanvas(transformedCanvas : HTMLCanvasElement, ceilCanvas : HTMLCanvasElement, floorCanvas : HTMLCanvasElement) : HTMLCanvasElement {
-        var unit = transformedCanvas.width / 16
-
-        var canvas = document.createElement('canvas')
-        canvas.width = unit * 18
-        canvas.height = unit * 12
-
-        var ctx : CanvasRenderingContext2D = canvas.getContext('2d')
-        
-        ctx.drawImage(ceilCanvas, unit*1, unit*1)
-        ctx.drawImage(floorCanvas, unit*1, unit*9)
-        ctx.drawImage(transformedCanvas, unit*0, unit*1, unit*16, unit*6, unit*1, unit*3, unit*16, unit*6)
-
-        return canvas
+    public drawWall(srcCanvas : HTMLCanvasElement, dstCtx : CanvasRenderingContext2D) : void {
+        dstCtx.drawImage(srcCanvas,
+                      this.unit*0, this.unit*1, this.unit*16, this.unit*6,
+                      this.unit*1, this.unit*3, this.unit*16, this.unit*6);
     }
 
     public markedCanvas(originalCanvas : HTMLCanvasElement, strokeStyle : string) : HTMLCanvasElement {
-        var unit = originalCanvas.width / 18
-        var scale = Math.sqrt(2) - 1
+        let scale = Math.sqrt(2) - 1
 
-        var markedCanvas = document.createElement('canvas')
+        let markedCanvas = document.createElement('canvas')
         markedCanvas.width = originalCanvas.width
         markedCanvas.height = originalCanvas.height
 
-        var ctx : CanvasRenderingContext2D = markedCanvas.getContext('2d')
+        let ctx : CanvasRenderingContext2D = <CanvasRenderingContext2D>markedCanvas.getContext('2d', { storage: "discardable" })
 
         for (var row = 0 ; row < 8 ; row++) {
             ctx.save()
-            ctx.translate(unit*(1+row*2), unit*3)
+            ctx.translate(this.unit*(1+row*2), this.unit*3)
             ctx.beginPath()
             ctx.strokeStyle = strokeStyle
             ctx.lineCap = "round"
             ctx.lineWidth = 6
-            ctx.moveTo(unit*(1-scale), 0             )
-            ctx.lineTo(unit*(1-scale), -unit/8       )
-            ctx.lineTo(unit*(1+scale), -unit/8       )
-            ctx.lineTo(unit*(1+scale), 0             )
+            ctx.moveTo(this.unit*(1-scale), 0           )
+            ctx.lineTo(this.unit*(1-scale), -this.unit/8)
+            ctx.lineTo(this.unit*(1+scale), -this.unit/8)
+            ctx.lineTo(this.unit*(1+scale), 0           )
             ctx.stroke()
             ctx.restore()
         }
 
         for (var row = 0 ; row < 8 ; row++) {
             ctx.save()
-            ctx.translate(unit*(1+row*2), unit*9)
+            ctx.translate(this.unit*(1+row*2), this.unit*9)
             ctx.beginPath()
             ctx.strokeStyle = strokeStyle
             ctx.lineCap = "round"
             ctx.lineWidth = 6
-            ctx.moveTo(unit*(1-scale), 0             )
-            ctx.lineTo(unit*(1-scale), unit/8        )
-            ctx.lineTo(unit*(1+scale), unit/8        )
-            ctx.lineTo(unit*(1+scale), 0             )
+            ctx.moveTo(this.unit*(1-scale), 0          )
+            ctx.lineTo(this.unit*(1-scale), this.unit/8)
+            ctx.lineTo(this.unit*(1+scale), this.unit/8)
+            ctx.lineTo(this.unit*(1+scale), 0          )
             ctx.stroke()
             ctx.restore()
         }
 
         ctx.save()
-        ctx.translate(unit*17, unit*5)
+        ctx.translate(this.unit*17, this.unit*5)
         ctx.beginPath()
         ctx.strokeStyle = strokeStyle
         ctx.lineCap = "round"
         ctx.lineWidth = 6
-        ctx.moveTo(0             , 0             )
-        ctx.lineTo(unit/8        , 0             )
-        ctx.lineTo(unit/8        , unit*2        )
-        ctx.lineTo(0             , unit*2        )
+        ctx.moveTo(0             , 0          )
+        ctx.lineTo(this.unit/8   , 0          )
+        ctx.lineTo(this.unit/8   , this.unit*2)
+        ctx.lineTo(0             , this.unit*2)
         ctx.stroke()
         ctx.restore()
 
         for (var row = 1 ; row < 8 ; row+=2) {
             ctx.save()
-            ctx.translate(unit*(1+row*2), unit*5)
+            ctx.translate(this.unit*(1+row*2), this.unit*5)
             ctx.beginPath()
             ctx.strokeStyle = strokeStyle
             ctx.lineCap = "round"
             ctx.lineWidth = 8
-            ctx.moveTo(-unit/8 + 0             , 0             )
-            ctx.lineTo(-unit/8 + unit*(1-scale), -unit*2       )
-            ctx.lineTo(          unit*(1-scale), -unit*2       )
+            ctx.moveTo(-this.unit/8 + 0                  ,  0          )
+            ctx.lineTo(-this.unit/8 + this.unit*(1-scale), -this.unit*2)
+            ctx.lineTo(               this.unit*(1-scale), -this.unit*2)
             ctx.stroke()
-            ctx.moveTo(       unit*(1+scale)   , -unit*2       )
-            ctx.lineTo(unit/8+unit*(1+scale)   , -unit*2       )
-            ctx.lineTo(unit/8+unit*2           , 0             )
+            ctx.moveTo(            this.unit*(1+scale)   , -this.unit*2)
+            ctx.lineTo(this.unit/8+this.unit*(1+scale)   , -this.unit*2)
+            ctx.lineTo(this.unit/8+this.unit*2           ,  0          )
             ctx.stroke()
             ctx.restore()
         }
 
         for (var row = 1 ; row < 8 ; row+=2) {
             ctx.save()
-            ctx.translate(unit*(1+row*2), unit*7)
+            ctx.translate(this.unit*(1+row*2), this.unit*7)
             ctx.beginPath()
             ctx.strokeStyle = strokeStyle
             ctx.lineCap = "round"
             ctx.lineWidth = 8
-            ctx.moveTo(-unit/8 + 0             , 0             )
-            ctx.lineTo(-unit/8 + unit*(1-scale), unit*2        )
-            ctx.lineTo(          unit*(1-scale), unit*2        )
+            ctx.moveTo(-this.unit/8 + 0                  , 0          )
+            ctx.lineTo(-this.unit/8 + this.unit*(1-scale), this.unit*2)
+            ctx.lineTo(               this.unit*(1-scale), this.unit*2)
             ctx.stroke()
-            ctx.moveTo(       unit*(1+scale)   , unit*2        )
-            ctx.lineTo(unit/8+unit*(1+scale)   , unit*2        )
-            ctx.lineTo(unit/8+unit*2           , 0             )
+            ctx.moveTo(            this.unit*(1+scale)   , this.unit*2)
+            ctx.lineTo(this.unit/8+this.unit*(1+scale)   , this.unit*2)
+            ctx.lineTo(this.unit/8+this.unit*2           , 0          )
             ctx.stroke()
             ctx.restore()
         }
@@ -293,107 +273,107 @@ class Development {
         ctx.drawImage(originalCanvas, 0, 0)
 
         ctx.save()
-        ctx.translate(unit, unit)
+        ctx.translate(this.unit, this.unit)
         ctx.beginPath()
         ctx.strokeStyle = strokeStyle
         ctx.setLineDash([10, 30])
         ctx.lineCap = "round"
         ctx.lineWidth = 8
-        ctx.moveTo(unit*(1-scale), unit*2        )
-        ctx.lineTo(unit*0,         unit*(1+scale))
-        ctx.lineTo(unit*0,         unit*(1-scale))
-        ctx.lineTo(unit*(1-scale), 0             )
-        ctx.lineTo(unit*(1+scale), 0             )
-        ctx.lineTo(unit*2,         unit*(1-scale))
-        ctx.lineTo(unit*2,         unit*(1+scale))
-        ctx.lineTo(unit*(1+scale), unit*2        )
+        ctx.moveTo(this.unit*(1-scale), this.unit*2        )
+        ctx.lineTo(this.unit*0,         this.unit*(1+scale))
+        ctx.lineTo(this.unit*0,         this.unit*(1-scale))
+        ctx.lineTo(this.unit*(1-scale), 0                  )
+        ctx.lineTo(this.unit*(1+scale), 0                  )
+        ctx.lineTo(this.unit*2,         this.unit*(1-scale))
+        ctx.lineTo(this.unit*2,         this.unit*(1+scale))
+        ctx.lineTo(this.unit*(1+scale), this.unit*2        )
         ctx.stroke()
         ctx.restore()
 
         ctx.save()
-        ctx.translate(unit, unit*9)
+        ctx.translate(this.unit, this.unit*9)
         ctx.beginPath()
         ctx.strokeStyle = strokeStyle
         ctx.setLineDash([10, 30])
         ctx.lineCap = "round"
         ctx.lineWidth = 8
-        ctx.moveTo(unit*(1-scale), 0             )
-        ctx.lineTo(unit*0,         unit*(1-scale))
-        ctx.lineTo(unit*0,         unit*(1+scale))
-        ctx.lineTo(unit*(1-scale), unit*2        )
-        ctx.lineTo(unit*(1+scale), unit*2        )
-        ctx.lineTo(unit*2,         unit*(1+scale))
-        ctx.lineTo(unit*2,         unit*(1-scale))
-        ctx.lineTo(unit*(1+scale), 0             )
+        ctx.moveTo(this.unit*(1-scale), 0                  )
+        ctx.lineTo(this.unit*0,         this.unit*(1-scale))
+        ctx.lineTo(this.unit*0,         this.unit*(1+scale))
+        ctx.lineTo(this.unit*(1-scale), this.unit*2        )
+        ctx.lineTo(this.unit*(1+scale), this.unit*2        )
+        ctx.lineTo(this.unit*2,         this.unit*(1+scale))
+        ctx.lineTo(this.unit*2,         this.unit*(1-scale))
+        ctx.lineTo(this.unit*(1+scale), 0                  )
         ctx.stroke()
         ctx.restore()
 
         ctx.save()
-        ctx.translate(unit, unit*5)
+        ctx.translate(this.unit, this.unit*5)
         ctx.beginPath()
         ctx.strokeStyle = strokeStyle
         ctx.setLineDash([10, 30])
         ctx.lineCap = "round"
         ctx.lineWidth = 8
-        ctx.moveTo(unit*0        , 0             )
-        ctx.lineTo(unit*16       , 0             )
+        ctx.moveTo(this.unit*0        , 0             )
+        ctx.lineTo(this.unit*16       , 0             )
         ctx.stroke()
         ctx.restore()
 
         ctx.save()
-        ctx.translate(unit, unit*7)
+        ctx.translate(this.unit, this.unit*7)
         ctx.beginPath()
         ctx.strokeStyle = strokeStyle
         ctx.setLineDash([10, 30])
         ctx.lineCap = "round"
         ctx.lineWidth = 8
-        ctx.moveTo(unit*0        , 0             )
-        ctx.lineTo(unit*16       , 0             )
+        ctx.moveTo(this.unit*0        , 0             )
+        ctx.lineTo(this.unit*16       , 0             )
         ctx.stroke()
         ctx.restore()
 
         for (var row = 0 ; row < 8 ; row++) {
             ctx.save()
-            ctx.translate(unit*(1+row*2), unit*5)
+            ctx.translate(this.unit*(1+row*2), this.unit*5)
             ctx.beginPath()
             ctx.strokeStyle = strokeStyle
             ctx.setLineDash([10, 30])
             ctx.lineCap = "round"
             ctx.lineWidth = 8
-            ctx.moveTo(0             , 0             )
-            ctx.lineTo(unit*(1-scale), -unit*2       )
-            ctx.lineTo(unit*(1+scale), -unit*2       )
-            ctx.lineTo(unit*2        , 0             )
+            ctx.moveTo(0                  ,  0          )
+            ctx.lineTo(this.unit*(1-scale), -this.unit*2)
+            ctx.lineTo(this.unit*(1+scale), -this.unit*2)
+            ctx.lineTo(this.unit*2        ,  0          )
             ctx.stroke()
             ctx.restore()
         }
 
         for (var row = 0 ; row < 8 ; row++) {
             ctx.save()
-            ctx.translate(unit*(1+row*2), unit*7)
+            ctx.translate(this.unit*(1+row*2), this.unit*7)
             ctx.beginPath()
             ctx.strokeStyle = strokeStyle
             ctx.setLineDash([10, 30])
             ctx.lineCap = "round"
             ctx.lineWidth = 8
-            ctx.moveTo(0             , 0             )
-            ctx.lineTo(unit*(1-scale), unit*2        )
-            ctx.lineTo(unit*(1+scale), unit*2        )
-            ctx.lineTo(unit*2        , 0             )
+            ctx.moveTo(0                  , 0          )
+            ctx.lineTo(this.unit*(1-scale), this.unit*2)
+            ctx.lineTo(this.unit*(1+scale), this.unit*2)
+            ctx.lineTo(this.unit*2        , 0          )
             ctx.stroke()
             ctx.restore()
         }
 
         for (var row = 0 ; row <= 8 ; row++) {
             ctx.save()
-            ctx.translate(unit*(1+row*2), unit*5)
+            ctx.translate(this.unit*(1+row*2), this.unit*5)
             ctx.beginPath()
             ctx.strokeStyle = strokeStyle
             ctx.setLineDash([10, 30])
             ctx.lineCap = "round"
             ctx.lineWidth = 8
-            ctx.moveTo(0             , 0             )
-            ctx.lineTo(0             , unit*2        )
+            ctx.moveTo(0             , 0          )
+            ctx.lineTo(0             , this.unit*2)
             ctx.stroke()
             ctx.restore()
         }
